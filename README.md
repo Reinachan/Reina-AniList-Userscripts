@@ -6,6 +6,10 @@ Here I'll be be bundling all the userscripts I make for AniList.
 
 - Coming soon
 
+## Current Functionality
+
+- Adds a "replace" button under posts which will convert emoji to unicode which AniList can understand.
+
 ## Contribution Guide
 
 - Run `npm install` to install node modules. Required every time package.json has changed
