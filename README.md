@@ -8,7 +8,9 @@ Here I'll be be bundling all the userscripts I make for AniList.
 
 ## Contribution Guide
 
-- Use `npm run watch` to build on each save. Useful when you have the userscript running from a local file <br> You can easily setup that with [Violentmonkey](https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/#install-a-local-script).
+- Run `npm install` to install node modules. Required every time package.json has changed
+
+- Use `npm run watch` to build on each save. Useful when you have the userscript running from a local file. You can easily setup that with [Violentmonkey](https://violentmonkey.github.io/posts/how-to-edit-scripts-with-your-favorite-editor/#install-a-local-script). <br> Otherwise, you can run `npm run build` to manually build the userscript and import it yourself.
 
 - Uses [userscripter](https://github.com/SimonAlling/userscripter) framework with TypeScript.
 
