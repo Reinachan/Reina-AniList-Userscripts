@@ -1,57 +1,92 @@
 import create from '~src/helpers/create';
 import { fetchElement, fetchElementAll } from '~src/helpers/fetchElement';
 import replaceEmoji from '~src/helpers/replaceEmoji';
+import _ from 'lodash';
 
-const createReplaceAction = (
-	actionElement: HTMLElement | null,
-	textbox: HTMLElement
-): void => {
-	const publish = actionElement?.children[1];
+type ElementType = HTMLElement | null | undefined;
+
+// FIXME: If there was cached text, this somehow won't work on that element. createReplaceAction fails.
+// TODO: Refactor and improve readability
+
+const createReplaceAction = (i: number): void => {
+	// Root element that the other selectors are based on
+	const activityEditor = fetchElement(`#reina-activity-editor${i}`);
+
+	// cancel/send/post
+	const actionElement = activityEditor?.querySelector(
+		'.actions'
+	) as ElementType;
+
+	// input textarea
+	const textbox = activityEditor?.querySelector(
+		'.el-textarea__inner'
+	) as HTMLInputElement;
+
+	// send/publish and send private buttons
+	const sendBttn: ElementType = actionElement?.querySelector('.button.save');
+	const sendPrivateBttn: ElementType = actionElement?.querySelector(
+		'.el-tooltip.button.save'
+	);
 
 	if (actionElement) {
+		// Not running it again if it already exist. No need to rerender just to rerender.
 		const alreadyExist = actionElement?.querySelector('.reina-replace');
-
 		if (!alreadyExist) {
-			const replace = create({
+			if (sendBttn) {
+				sendBttn.style.display = 'none';
+			}
+			if (sendPrivateBttn) {
+				sendPrivateBttn.style.display = 'none';
+			}
+
+			const replaceBttn = create({
 				type: 'div',
 				classPrefix: 'reina',
 				classes: ['button', 'replace'],
 				before: {},
 				childOf: actionElement,
-				text: 'Replace',
+				text: 'Send 📮',
 			});
-			console.log(publish);
 
-			replace.addEventListener('click', () => {
+			replaceBttn.addEventListener('click', () => {
+				replaceEmoji(textbox);
 				textbox.dispatchEvent(new Event('input'));
+				_.delay(() => sendBttn?.dispatchEvent(new Event('click')), 100, 'sent');
 			});
 
-			/* if (publish) {
-				replace.addEventListener('click', function () {
-					publish.dispatchEvent(new Event('click'));
+			if (sendPrivateBttn) {
+				const replacePrivateBttn = create({
+					type: 'div',
+					classPrefix: 'reina',
+					classes: ['button', 'replace', 'private'],
+					before: {},
+					childOf: actionElement,
+					text: 'Send Private 🔏',
 				});
-			} */
+
+				replacePrivateBttn.addEventListener('click', () => {
+					replaceEmoji(textbox);
+					textbox.dispatchEvent(new Event('input'));
+					_.delay(
+						() => sendPrivateBttn?.dispatchEvent(new Event('click')),
+						10,
+						'sent'
+					);
+				});
+			}
 		}
 	}
 };
 
 export const unicodifier = (): void => {
-	const textboxes = fetchElementAll(
-		'.activity-edit > .input > textarea'
-	) as NodeListOf<HTMLInputElement> | null;
-	const activityActions = fetchElementAll('.activity-edit .actions');
-	const totalTextboxes = textboxes ? textboxes.length : null;
+	const activityEditors = fetchElementAll('.activity-edit');
 
-	if (textboxes && totalTextboxes && activityActions)
-		for (let i = 0; i < totalTextboxes; i += 1) {
-			const input = textboxes[i];
-			const action = activityActions[i];
-			createReplaceAction(action, input);
-			if (input.value) {
-				textboxes[i].value = replaceEmoji(input);
-				textboxes[i].dispatchEvent(new Event('input'));
-			}
-		}
+	activityEditors?.forEach((editor: HTMLElement, i) => {
+		editor.removeAttribute('id');
+		editor.setAttribute('id', 'reina-activity-editor' + i);
+
+		createReplaceAction(i);
+	});
 };
 
 export default unicodifier;

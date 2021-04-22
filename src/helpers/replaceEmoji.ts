@@ -1,6 +1,6 @@
 /** Replaces emoji and other characters that SQL can't process into a unicode string that it can actually understand.
  */
-const replaceEmoji = (input: HTMLInputElement): string => {
+const replaceEmoji = (input: HTMLInputElement): void => {
 	let result = '';
 	for (let i = 0; i < input.value.length; i += 1) {
 		const code = input.value.codePointAt(i) ?? 0;
@@ -11,7 +11,7 @@ const replaceEmoji = (input: HTMLInputElement): string => {
 			result += String.fromCodePoint(code);
 		}
 	}
-	return result;
+	input.value = result;
 };
 
 export default replaceEmoji;
